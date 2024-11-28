@@ -1,0 +1,41 @@
+---
+- name: Modifier les sources.list pour Debian, Ubuntu 24.04 LTS et Proxmox avec Ceph
+  hosts: all
+  become: true
+  vars:
+    mirror_url: "http://192.168.1.1"  # URL de votre miroir local -> voir article https://memo-linux.com/creer-un-serveur-miroir-local-sous-debian
+    debian_version: "bullseye"       # Version Debian
+    ubuntu_version: "noble"          # Nom de code pour Ubuntu 24.04 LTS (The Noble Numbat)
+    proxmox_version: "bullseye"      # Version Proxmox
+    ceph_version: "squid"            # Dernière version de Ceph dans Proxmox
+    ceph_repository_url: "{{ mirror_url }}/ceph"
+
+  tasks:
+    - name: Modifier le fichier sources.list pour Debian
+      when: "'debian' in group_names"
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb {{ mirror_url }}/debian {{ debian_version }} main contrib non-free
+          deb-src {{ mirror_url }}/debian {{ debian_version }} main contrib non-free
+
+    - name: Modifier le fichier sources.list pour Ubuntu 24.04 LTS
+      when: "'ubuntu' in group_names"
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb {{ mirror_url }}/ubuntu {{ ubuntu_version }} main restricted universe multiverse
+          deb-src {{ mirror_url }}/ubuntu {{ ubuntu_version }} main restricted universe multiverse
+
+    - name: Modifier le fichier sources.list pour Proxmox
+      when: "'proxmox' in group_names"
+      copy:
+        dest: /etc/apt/sources.list.d/pve-no-subscription.list
+        content: |
+          deb {{ mirror_url }}/proxmox {{ proxmox_version }} pve-no-subscription
+
+    - name: Désactiver le dépôt Proxmox Enterprise
+      when: "'proxmox' in group_names"
+      file:
+        path: /etc/apt/sources.list.d/pve-enterprise.list
+        state: absent
