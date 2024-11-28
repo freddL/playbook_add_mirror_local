@@ -1,0 +1,22 @@
+all:
+  children:
+    debian:
+      hosts:
+        debian-server-1:
+          ansible_host: 192.168.1.10 # à changer avec vos IPs
+        debian-server-2:
+          ansible_host: 192.168.1.11
+    ubuntu:
+      hosts:
+        ubuntu-server-1:
+          ansible_host: 192.168.1.20
+        ubuntu-server-2:
+          ansible_host: 192.168.1.21
+    proxmox:
+      hosts:
+        proxmox-server-1:
+          ansible_host: 192.168.1.30
+        proxmox-server-2:
+          ansible_host: 192.168.1.31
+        proxmox-server-3:
+          ansible_host: 192.168.1.32
